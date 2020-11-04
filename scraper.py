@@ -8,6 +8,9 @@ from urllib.parse import urlparse
 urlNum = 0
 
 def scraper(url, resp):
+    # parsed the pages and compare it with document store
+    # if similar enough return emptry list  `return []`
+
     links = extract_next_links(url, resp)
     cleanCloseDups = search(url, links, resp)
     return cleanCloseDups
