@@ -6,6 +6,28 @@ def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
+def search(url, resp):
+    #similarUrls = []   list of urls that are similar
+    #urlTokens = 0  number of tokens in our url
+    #tokenDict = {} dictionary of all tokens in our url
+    #parse url if new token found put the new token as a key in dictionary and urlTokens++
+
+    #for every url in the corpus 
+        #int sameTokenCt = 0
+        #tempTokenSet = [] a set of every token in the comparison url
+        #for every token in tempTokenSet
+        #     if token in tokenDict increment
+                    #TokenCt++
+        #if sameTokenCt >= (.9 * urlTokens) if 90% of tokens are the same
+        #     add url to list of similarUrls
+    
+
+
+ 
+    
+    
+
+
 def extract_next_links(url, resp):
     return_list = []
 
