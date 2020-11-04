@@ -10,7 +10,7 @@ def scraper(url, resp):
 #this function is a similarity search that returns an updated list of the next links without links that are too similar(90% token similarity)
 def search(url, nextLinks, scraperResp):
     #parse through the url text
-    soup = BeautifulSoup(resp, features="html.parser", from_encoding="iso-8859-1")
+    soup = BeautifulSoup(scraperResp, features="html.parser", from_encoding="iso-8859-1")
     text = soup.get_text()
 
     #initializes list to return at end of function which contains all next links with no similarities
