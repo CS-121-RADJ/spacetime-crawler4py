@@ -30,7 +30,7 @@ def search(url, nextLinks, scraperResp):
     #iterate through list of tokens if new token found put the new token as a key in dictionary and urlTokens++
     for word in resp_words:
         if word in tokenDict.keys() == False:
-            tokenDict.add(word, 1)
+            tokenDict[word] = 1
             url_tokens+=1
         else:
             tokenDict[word]+=1
@@ -38,7 +38,7 @@ def search(url, nextLinks, scraperResp):
     #iterate through all of the nextLinks
     for nextLinkUrl in nextLinks:
         #parse through the nextLink url text
-        nxt_link_soup = BeautifulSoup(resp, features="html.parser", from_encoding="iso-8859-1")
+        nxt_link_soup = BeautifulSoup(scraperResp, features="html.parser", from_encoding="iso-8859-1")
         nxt_link_text = nxt_link_soup.get_text()
 
         #copied code from recorder.py to get a list of all tokens in the url
@@ -52,17 +52,17 @@ def search(url, nextLinks, scraperResp):
         same_token_ct = 0
 
         #a set of all tokens in the url of the next link
-        nxt_link_token_set = set(next_link_resp_words)
+        nxt_link_token_set = set(nxt_link_resp_words)
 
         for token in nxt_link_token_set:
         #   if tokenDict contains the token in nxtLinkTokenSet as a key increment
-            if tokenDict.has_key(token):
+            if token in tokenDict.keys():
                     same_token_ct+=1
         #if 90% of tokens are the same do not add the url to the new list
         if same_token_ct >= (.9 * url_tokens): 
             continue
         else:
-            linksNoSimilarities.add(nextLinkUrl)
+            linksNoSimilarities.append(nextLinkUrl)
     #returns the new list of next Links with no similarities
     return linksNoSimilarities
 
