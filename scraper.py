@@ -6,7 +6,7 @@ def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
-def search(url, resp):
+def search(url, nextLinks):
     #similarUrls = []   list of urls that are similar
     #urlTokens = 0  number of tokens in our url
     #tokenDict = {} dictionary of all tokens in our url
