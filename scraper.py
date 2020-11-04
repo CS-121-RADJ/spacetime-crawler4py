@@ -9,30 +9,61 @@ def scraper(url, resp):
 
 
 def search(url, nextLinks, scraperResp):
+    #parse through the url text
+    soup = BeautifulSoup(resp, features="html.parser", from_encoding="iso-8859-1")
+    text = soup.get_text()
+
+    #initializes list to return at end of function which contains all next links with no similarities
     linksNoSimilarities = []
     #number of tokens in our url
-    urlTokens = 0  
-    #dictionary of all tokens in our url
+    url_tokens = 0  
+    #dictionary that will keep track of all tokens in our url and how many times they show up
     tokenDict = {} 
-    #parse url if new token found put the new token as a key in dictionary and urlTokens++
+
+    #copied code from recorder.py to get a list of all tokens in the url
+    # Mapping all the words from the line to be lowercase while also spiting the word into a list by whitespace
+    resp_words = list(map(lambda x: x.lower().strip(), text.split(' ')))
+    # filtering out all the non alphanumeric chars
+    resp_words = list(map(lambda word: ''.join(list(filter(lambda x: x.isalnum(), [char for char in word]))), resp_words))
+    resp_words = list(filter(lambda word: len(word) > 1, resp_words))
+
+    #iterate through list of tokens if new token found put the new token as a key in dictionary and urlTokens++
+    for word resp_words:
+        if tokenDict.has_key(word) == False
+            tokenDict.add(word, 1)
+            url_tokens+=1
+        else
+            tokenDict[word]+=1
 
     #iterate through all of the nextLinks
     for nextLinkUrl in nextLinks:
+        #parse through the nextLink url text
+        nxt_link_soup = BeautifulSoup(resp, features="html.parser", from_encoding="iso-8859-1")
+        nxt_link_text = nxt_link_soup.get_text()
+
+        #copied code from recorder.py to get a list of all tokens in the url
+         # Mapping all the words from the line to be lowercase while also spiting the word into a list by whitespace
+        nxt_link_resp_words = list(map(lambda x: x.lower().strip(), nxt_link_text.split(' ')))
+        # filtering out all the non alphanumeric chars
+        nxt_link_resp_words = list(map(lambda word: ''.join(list(filter(lambda x: x.isalnum(), [char for char in word]))), resp_words))
+        nxt_link_resp_words = list(filter(lambda word: len(word) > 1, resp_words))
+
         #int that keeps track of number of tokens in the url
-        sameTokenCt = 0
+        same_token_ct = 0
 
-        #nxtLinkTokenSet = [] a set of every token in the comparison url
+        #a set of all tokens in the url of the next link
+        nxt_link_token_set = set(next_link_resp_words)
 
-        for token in nxtLinkTokenSet:
+        for token in nxt_link_token_set:
         #   if tokenDict contains the token in nxtLinkTokenSet as a key increment
             if tokenDict.has_key(token)
-                    sameTokenCt+=1
+                    same_token_ct+=1
         #if 90% of tokens are the same do not add the url to the new list
-        if sameTokenCt >= (.9 * urlTokens) 
+        if same_token_ct >= (.9 * url_tokens) 
             continue
         else
             linksNoSimilarities.add(nextLinkUrl)
-    #returns the new list of nextLinks with no similarities
+    #returns the new list of next Links with no similarities
     return linksNoSimilarities
 
 def extract_next_links(url, resp):
