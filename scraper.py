@@ -4,22 +4,39 @@ from urllib.parse import urlparse
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
+    #links = search(url, links, resp)
     return [link for link in links if is_valid(link)]
 
-def search(url, nextLinks):
-    #similarUrls = []   list of urls that are similar
-    #urlTokens = 0  number of tokens in our url
-    #tokenDict = {} dictionary of all tokens in our url
+
+def search(url, nextLinks, scraperResp):
+    linksNoSimilarities = []
+    #number of tokens in our url
+    urlTokens = 0  
+    #dictionary of all tokens in our url
+    tokenDict = {} 
     #parse url if new token found put the new token as a key in dictionary and urlTokens++
 
-    #for every url in the corpus 
-        #int sameTokenCt = 0
-        #tempTokenSet = [] a set of every token in the comparison url
-        #for every token in tempTokenSet
-        #     if token in tokenDict increment
-                    #TokenCt++
-        #if sameTokenCt >= (.9 * urlTokens) if 90% of tokens are the same
-        #     add url to list of similarUrls
+    #iterate through all of the nextLinks
+    for nextLinkUrl in the nextLinks:
+        #int that keeps track of number of tokens in the url
+        int sameTokenCt = 0
+
+        #nxtLinkTokenSet = [] a set of every token in the comparison url
+
+        for token in nxtLinkTokenSet:
+        #   if tokenDict contains the token in nxtLinkTokenSet as a key increment
+            if tokenDict.has_key(token)
+                    sameTokenCt+=1
+        #if 90% of tokens are the same do not add the url to the new list
+        if sameTokenCt >= (.9 * urlTokens) 
+            continue
+        else
+            linksNoSimilarities.add(nextLinkUrl)
+    #returns the new list of nextLinks with no similarities
+    return linksNoSimilarities
+
+
+        
     
 
 
