@@ -4,7 +4,9 @@ from urllib.parse import urlparse
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    #links = search(url, links, resp)
+    updated_links = search(url, links, resp)
+    if len(links) > len(updated_links):
+        links = updated_links
     return [link for link in links if is_valid(link)]
 
 #this function is a similarity search that returns an updated list of the next links without links that are too similar(90% token similarity)
