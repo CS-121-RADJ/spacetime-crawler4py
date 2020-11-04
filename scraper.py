@@ -19,7 +19,7 @@ def search(url, nextLinks, scraperResp):
     #iterate through all of the nextLinks
     for nextLinkUrl in nextLinks:
         #int that keeps track of number of tokens in the url
-        int sameTokenCt = 0
+        sameTokenCt = 0
 
         #nxtLinkTokenSet = [] a set of every token in the comparison url
 
