@@ -29,10 +29,10 @@ def search(url, nextLinks, scraperResp):
 
     #iterate through list of tokens if new token found put the new token as a key in dictionary and urlTokens++
     for word in resp_words:
-        if tokenDict.has_key(word) == False
+        if tokenDict.has_key(word) == False:
             tokenDict.add(word, 1)
             url_tokens+=1
-        else
+        else:
             tokenDict[word]+=1
 
     #iterate through all of the nextLinks
@@ -56,12 +56,12 @@ def search(url, nextLinks, scraperResp):
 
         for token in nxt_link_token_set:
         #   if tokenDict contains the token in nxtLinkTokenSet as a key increment
-            if tokenDict.has_key(token)
+            if tokenDict.has_key(token):
                     same_token_ct+=1
         #if 90% of tokens are the same do not add the url to the new list
-        if same_token_ct >= (.9 * url_tokens) 
+        if same_token_ct >= (.9 * url_tokens): 
             continue
-        else
+        else:
             linksNoSimilarities.add(nextLinkUrl)
     #returns the new list of next Links with no similarities
     return linksNoSimilarities
