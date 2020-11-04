@@ -17,7 +17,7 @@ def search(url, nextLinks, scraperResp):
     #parse url if new token found put the new token as a key in dictionary and urlTokens++
 
     #iterate through all of the nextLinks
-    for nextLinkUrl in the nextLinks:
+    for nextLinkUrl in nextLinks:
         #int that keeps track of number of tokens in the url
         int sameTokenCt = 0
 
@@ -34,16 +34,6 @@ def search(url, nextLinks, scraperResp):
             linksNoSimilarities.add(nextLinkUrl)
     #returns the new list of nextLinks with no similarities
     return linksNoSimilarities
-
-
-        
-    
-
-
- 
-    
-    
-
 
 def extract_next_links(url, resp):
     return_list = []
