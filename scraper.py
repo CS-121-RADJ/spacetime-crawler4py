@@ -29,7 +29,7 @@ def search(url, nextLinks, scraperResp):
 
     #iterate through list of tokens if new token found put the new token as a key in dictionary and urlTokens++
     for word in resp_words:
-        if tokenDict.has_key(word) == False:
+        if word in tokenDict.keys() == False:
             tokenDict.add(word, 1)
             url_tokens+=1
         else:
