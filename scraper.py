@@ -56,6 +56,8 @@ def search(url, nextLinks, scraperResp):
         #if we find a similar url in the database, set extract to false so we know not to get next links
         if same_token_ct / url_tokens > 0.9: 
             extract = False
+            #exits loop because current url has been deemed a similarity, no reason to keep checking
+            break
 
     #if no similar urls found, extract will still == true so we get the next links of the current url and put into list
     if extract == True:
