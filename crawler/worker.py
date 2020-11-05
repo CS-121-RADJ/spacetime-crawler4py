@@ -23,14 +23,21 @@ class Worker(Thread):
         parsed = urlparse(url)
 
         if parsed.netloc in self.robots_txt_dict:
+            if self.robots_txt_dict[parsed.netloc] == 0: # 0 means that a robots.txt was not able to be gotten from that site so it assumes its all able to be crawled 
+                return True
             return self.robots_txt_dict[parsed.netloc].can_fetch('*', url)
         
-        rp = RobotFileParser()
-        rp.set_url('{}://{}/robots.txt'.format(parsed.scheme, parsed.netloc))
-        rp.read()
-        self.robots_txt_dict[parsed.netloc] = rp
+        try:
+            rp = RobotFileParser()
+            rp.set_url('{}://{}/robots.txt'.format(parsed.scheme, parsed.netloc))
+            rp.read()
+            self.robots_txt_dict[parsed.netloc] = rp
 
-        return rp.can_fetch('*', url)
+            return rp.can_fetch('*', url)
+        except:
+            print('error getting robots.txt')
+            self.robots_txt_dict[parsed.netloc] = 0
+            return True
 
 
     def run(self):
