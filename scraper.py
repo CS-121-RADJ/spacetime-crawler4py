@@ -1,33 +1,24 @@
 import re
 import requests
+import json
 from bs4 import BeautifulSoup, SoupStrainer
 from urllib.parse import urlparse
 
+#global variable keeps track of number of urls that we have scraped/number of txt files of token data in urlTokenData 
+urlNum = 0
+
 def scraper(url, resp):
-    # links = extract_next_links(url, resp)
-    # updated_links = search(url, links, resp)
-    # if len(links) > len(updated_links):
-    #     # print(f'links len = {len(links)} & updated_links len = {len(updated_links)}')
-    #     links = updated_links
-    # return [link for link in links if is_valid(link)] 
-    links = set([link for link in extract_next_links(url, resp) if is_valid(link)])  # cleaned links, removes exact dups
+    links = extract_next_links(url, resp)
     cleanCloseDups = search(url, links, resp)
     return cleanCloseDups
 
-#this function is a similarity search that returns an updated list of the next links without links that are too similar(90% token similarity)
+#this function is a similarity search that only returns the next links if current url is not similar to any document that has so far already been scraped
 def search(url, nextLinks, scraperResp):
     #parse through the url text
     # print(scraperResp.raw_response.content)
     soup = BeautifulSoup(scraperResp.raw_response.content, features="html.parser", from_encoding="iso-8859-1")
     text = soup.get_text()
-
-    #initializes list to return at end of function which contains all next links with no similarities
-    linksNoSimilarities = []
-    #number of tokens in our url
-    url_tokens = 0  
-    #dictionary that will keep track of all tokens in our url and how many times they show up
-    tokenDict = {} 
-
+    
     #copied code from recorder.py to get a list of all tokens in the url
     # Mapping all the words from the line to be lowercase while also spiting the word into a list by whitespace
     resp_words = list(map(lambda x: x.lower().strip(), text.split(' ')))
@@ -35,52 +26,51 @@ def search(url, nextLinks, scraperResp):
     resp_words = list(map(lambda word: ''.join(list(filter(lambda x: x.isalnum(), [char for char in word]))), resp_words))
     resp_words = list(filter(lambda word: len(word) > 1, resp_words))
 
-    #iterate through list of tokens if new token found put the new token as a key in dictionary and urlTokens++
-    for word in resp_words:
-        if word not in tokenDict.keys():
-            tokenDict[word] = 1
-        else:
-            tokenDict[word]+=1
-    url_tokens = len(tokenDict)
-    print(f'tokenDict = {tokenDict}\nurl_tokens = {url_tokens}')
-    #iterate through all of the nextLinks
-    for link in nextLinks:
-        print(link)
-    for nextLinkUrl in nextLinks:
-        #parse through the nextLink url text
-        page = requests.get(nextLinkUrl)
-        nxt_link_soup = BeautifulSoup(page.text, features="html.parser", from_encoding="iso-8859-1")
-        nxt_link_text = nxt_link_soup.get_text()
+    #remove duplicates from our list of tokens
+    tokenSet = set(resp_words)
+    #convert back into a list so we can json.dump it on line 65(got error when we tried json.dump with a et)
+    tokenList = list(tokenSet)
+    #number of tokens of our current url
+    url_tokens = len(tokenSet)
+    #boolean value that tells us whether to get next links or not, if extract still == true after the loop we will extract next links
+    extract = True
+    #creates empty list of next links to return at end if cuurent url is not similar to any previously scraped url
+    nxtLinks = list()
 
-        #copied code from recorder.py to get a list of all tokens in the url
-        # Mapping all the words from the line to be lowercase while also spiting the word into a list by whitespace
-        nxt_link_resp_words = list(map(lambda x: x.lower().strip(), nxt_link_text.split(' ')))
-        # filtering out all the non alphanumeric chars
-        nxt_link_resp_words = list(map(lambda word: ''.join(list(filter(lambda x: x.isalnum(), [char for char in word]))), nxt_link_resp_words))
-        nxt_link_resp_words = list(filter(lambda word: len(word) > 1, nxt_link_resp_words))
+    global urlNum
 
-        
-        #int that keeps track of number of tokens in the url
+    #iterate through all the previous urlTokenData txt files which contain all tokens in previously scraped urls and add each token into a list of tokens
+    for i in range(urlNum):
+        #txt file of url we are compaing our current url to that contains all tokens of previously scraped url
+        comparefile = open("urlTokenData/url{}.txt".format(i), 'r')
+        #puts all tokens from above file into a list
+        compareFileTknList = [line.split(',') for line in comparefile.readlines()]
+        #integer to keep track of how many of the tokens are the same
         same_token_ct = 0
 
-        #a set of all tokens in the url of the next link
-        nxt_link_token_set = set(nxt_link_resp_words)
-        print(f'nxt_link_token_set for {nextLinkUrl}\n{nxt_link_token_set}')
-       
-        for token in nxt_link_token_set:
-        #   if tokenDict contains the token in nxtLinkTokenSet as a key increment
-            if token in tokenDict.keys():
-                    same_token_ct+=1
-        #if 90% of tokens are the same do not add the url to the new list
-        print(f'same_token_ct = {same_token_ct}\n')
-        print(f'same_token_ct / urlTokens = {same_token_ct/ url_tokens}')
-        if same_token_ct / url_tokens < 0.9: 
-            linksNoSimilarities.append(nextLinkUrl)
-        else:
-            continue
-        
-    #returns the new list of next Links with no similarities
-    return linksNoSimilarities
+        #iterate through the list of previously scraped url's tokens and check if tokens are in the current url tokenSet
+        for j in range(len(compareFileTknList)):
+            if compareFileTknList.index(j) in tokenSet:
+                #if token from previously scraped url found in current url tokenSet increment same_tkn_ct by 1
+                same_token_ct+=1
+        #if we find a similar url in the database, set extract to false so we know not to get next links
+        if same_token_ct / url_tokens > 0.9: 
+            extract = False
+
+    #if no similar urls found, extract will still == true so we get the next links of the current url and put into list
+    if extract == True:
+        nxtLinks = extract_next_links(url, scraperResp)
+
+    #add to utlTokenData folder a txt file containing all tokens in current url named url{currentNumberUrl}.txt Example: first url called 'url1.txt', next url called 'url2.txt'... and so on
+    #now for url we scrape, tokens for this url are in the database of previous url tokens to check for similarity
+    fileName = "urlTokenData/url{}.txt".format(urlNum)
+    with open(fileName, 'w') as outfile:
+        json.dump(tokenList, outfile)
+    #increment 1 to global variable urlNum
+    urlNum+=1
+    
+    #if current url similar to a previously scraped url, list will be empty, if not, list will contain next links
+    return nxtLinks
 
 def extract_next_links(url, resp):
     return_list = []
