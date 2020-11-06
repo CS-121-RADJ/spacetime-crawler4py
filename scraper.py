@@ -10,13 +10,11 @@ urlNum = 0
 def scraper(url, resp):
     # parsed the pages and compare it with document store
     # if similar enough return emptry list  `return []`
-
-    links = extract_next_links(url, resp)
-    cleanCloseDups = search(url, links, resp)
+    cleanCloseDups = search(url, resp)
     return cleanCloseDups
 
 #this function is a similarity search that only returns the next links if current url is not similar to any document that has so far already been scraped
-def search(url, nextLinks, scraperResp):
+def search(url, scraperResp):
     #parse through the url text
     # print(scraperResp.raw_response.content)
     soup = BeautifulSoup(scraperResp.raw_response.content, features="html.parser", from_encoding="iso-8859-1")
