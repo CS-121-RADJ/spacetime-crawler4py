@@ -11,7 +11,7 @@ def scraper(url, resp):
     # parsed the pages and compare it with document store
     # if similar enough return emptry list  `return []`
     cleanCloseDups = search(url, resp)
-    return cleanCloseDups
+    return [link for link in cleanCloseDups if is_valid(link)]
 
 #this function is a similarity search that only returns the next links if current url is not similar to any document that has so far already been scraped
 def search(url, scraperResp):
@@ -104,7 +104,7 @@ def is_valid(url):
 
         uci_link = False
         for base_link in valid_sites:
-            if(base_link in parsed.netloc):
+            if(base_link in parsed.netloc + parsed.path):
                 uci_link = True
 
         if(not uci_link):
@@ -115,6 +115,9 @@ def is_valid(url):
 
         # Being used to detect calaneder links that go on for too long
         if('wics' in parsed.netloc.lower() and bool(re.search('/events/.*?/', parsed.path.lower()))):
+            return False
+
+        if('today' in parsed.netloc.lower() and bool(re.search('/calender/.*?/', parsed.path.lower()))):
             return False
         
         # There are fragments that that just give the browser direction and can be thrown out
