@@ -10,6 +10,7 @@ domainCount.json
 misc_stats.json
 urls.json
 word_count.json
+urlTokenData/*
 
 # Distribution / packaging
 .Python

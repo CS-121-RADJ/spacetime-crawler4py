@@ -40,20 +40,23 @@ class Recorder:
             print(json_dump, file=outfile)
 
     def load_data(self):
-        with open('word_count.json') as json_file:
-            self.words = json.load(json_file)
+        try:
+            with open('word_count.json') as json_file:
+                self.words = json.load(json_file)
 
-        with open('domainCount.json') as json_file:
-            self.uniqueDomains = json.load(json_file)
+            with open('domainCount.json') as json_file:
+                self.uniqueDomains = json.load(json_file)
 
-        with open('misc_stats.json') as json_file:
-            data = json.load(json_file)
-            self.uniqueUrls = data['uniqueUrls']
-            self.longestUrl = data['longestUrl']
-            self.longestUrlContent = data['longestUrlContent']
-        
-        with open('urls.json') as json_file:
-            self.urls = set(json.load(json_file)['urls'])
+            with open('misc_stats.json') as json_file:
+                data = json.load(json_file)
+                self.uniqueUrls = data['uniqueUrls']
+                self.longestUrl = data['longestUrl']
+                self.longestUrlContent = data['longestUrlContent']
+
+            with open('urls.json') as json_file:
+                self.urls = set(json.load(json_file)['urls'])
+        except:
+            print('No save file found')
 
     def is_stop_word(self, word):
         stop_words = [

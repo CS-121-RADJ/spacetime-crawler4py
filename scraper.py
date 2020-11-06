@@ -17,6 +17,8 @@ def scraper(url, resp):
 def search(url, scraperResp):
     #parse through the url text
     # print(scraperResp.raw_response.content)
+    if (scraperResp.raw_response == None or scraperResp.status != 200):
+        return []
     soup = BeautifulSoup(scraperResp.raw_response.content, features="html.parser", from_encoding="iso-8859-1")
     text = soup.get_text()
     
@@ -44,18 +46,23 @@ def search(url, scraperResp):
     for i in range(urlNum):
         #txt file of url we are compaing our current url to that contains all tokens of previously scraped url
         comparefile = open("urlTokenData/url{}.txt".format(i), 'r')
-        #puts all tokens from above file into a list
-        compareFileTknList = [line.split(',') for line in comparefile.readlines()]
+        #puts all tokens from above file into a list and cleans it up
+        compare_file_token_list = comparefile.readlines()[0]
+        compare_file_token_list = compare_file_token_list.split(',')
+        compare_file_token_list = map(lambda x: x.replace('"', ''), compare_file_token_list)
+        compare_file_token_list = map(lambda x: x.replace('[', ''), compare_file_token_list)
+        compare_file_token_list = map(lambda x: x.replace(']', ''), compare_file_token_list)
+        compare_file_token_list = list(compare_file_token_list)
         #integer to keep track of how many of the tokens are the same
         same_token_ct = 0
 
         #iterate through the list of previously scraped url's tokens and check if tokens are in the current url tokenSet
-        for j in range(len(compareFileTknList)):
-            if compareFileTknList.index(j) in tokenSet:
+        for j in range(len(compare_file_token_list)):
+            if compare_file_token_list[j] in tokenSet:
                 #if token from previously scraped url found in current url tokenSet increment same_tkn_ct by 1
                 same_token_ct+=1
         #if we find a similar url in the database, set extract to false so we know not to get next links
-        if same_token_ct / url_tokens > 0.9: 
+        if url_tokens > 0 and same_token_ct / url_tokens > 0.9: 
             extract = False
             #exits loop because current url has been deemed a similarity, no reason to keep checking
             break
